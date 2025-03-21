@@ -26,8 +26,8 @@ public class BoidsSimulation {
     					MAX_SPEED,
     					PERCEPTION_RADIUS,
     					AVOID_RADIUS); 
-    	var sim = new BoidsSimulator(model);
-    	var view = new BoidsView(model, SCREEN_WIDTH, SCREEN_HEIGHT);
+    	var sim = new BoidsSerialSimulator(model);
+    	var view = new BoidsView(model, SCREEN_WIDTH, SCREEN_HEIGHT, sim);
     	sim.attachView(view);
     	sim.runSimulation();
     }

@@ -27,8 +27,6 @@ public class BoidsPanel extends JPanel {
         var h = view.getHeight();
         var envWidth = model.getWidth();
         var xScale = w/envWidth;
-        // var envHeight = model.getHeight();
-        // var yScale = h/envHeight;
 
         var boids = model.getBoids();
 

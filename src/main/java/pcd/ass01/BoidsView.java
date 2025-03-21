@@ -9,16 +9,18 @@ import java.util.Hashtable;
 
 public class BoidsView implements ChangeListener {
 
-	private JFrame frame;
-	private BoidsPanel boidsPanel;
-	private JSlider cohesionSlider, separationSlider, alignmentSlider;
-	private BoidsModel model;
-	private int width, height;
+	private final JFrame frame;
+	private final BoidsPanel boidsPanel;
+	private final JSlider cohesionSlider, separationSlider, alignmentSlider;
+	private final BoidsModel model;
+	private final int width, height;
+    private final BoidsSimulator simulator;
 	
-	public BoidsView(BoidsModel model, int width, int height) {
+	public BoidsView(final BoidsModel model, final int width, final int height, final BoidsSimulator simulator) {
 		this.model = model;
 		this.width = width;
 		this.height = height;
+        this.simulator = simulator;
 		
 		frame = new JFrame("Boids Simulation");
         frame.setSize(width, height);
@@ -27,6 +29,9 @@ public class BoidsView implements ChangeListener {
 		JPanel cp = new JPanel();
 		LayoutManager layout = new BorderLayout();
 		cp.setLayout(layout);
+
+        JPanel inputPanel = getInputePanel(model);
+        cp.add(BorderLayout.NORTH, inputPanel);
 
         boidsPanel = new BoidsPanel(this, model);
 		cp.add(BorderLayout.CENTER, boidsPanel);
@@ -66,6 +71,32 @@ public class BoidsView implements ChangeListener {
         slider.addChangeListener(this);
 		return slider;
 	}
+
+    private JPanel getInputePanel(final BoidsModel model) {
+        JPanel inputPanel = new JPanel();
+        var boidsNumberInput = new JTextField(String.valueOf(model.getBoids().size()), 10);
+        boidsNumberInput.addActionListener((e) -> {
+            boidsNumberInput.setEditable(false);
+//            model.setBoids(Integer.parseInt(boidsNumberInput.getText()));
+        });
+        var resumeButton = new JButton("START");
+        resumeButton.addActionListener((e) -> {
+            if (!boidsNumberInput.isEditable()) {
+                this.simulator.resume();
+            }
+        });
+        var stopButton = new JButton("STOP");
+        stopButton.addActionListener((e) -> {
+            if (!boidsNumberInput.isEditable()) {
+                this.simulator.stop();
+            }
+        });
+
+        inputPanel.add(resumeButton);
+        inputPanel.add(stopButton);
+        inputPanel.add(boidsNumberInput);
+        return inputPanel;
+    }
 	
 	public void update(int frameRate) {
 		boidsPanel.setFrameRate(frameRate);

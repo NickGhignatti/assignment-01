@@ -12,7 +12,7 @@ public class BoidsSerialSimulator implements BoidsSimulator {
 
     public BoidsSerialSimulator(BoidsModel model) {
         this.model = model;
-        this.isRunning = true;
+        this.isRunning = false;
         this.view = Optional.empty();
     }
 

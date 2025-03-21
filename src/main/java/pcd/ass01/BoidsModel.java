@@ -9,7 +9,8 @@ public class BoidsModel {
     private final List<Boid> boids;
     private double separationWeight; 
     private double alignmentWeight; 
-    private double cohesionWeight; 
+    private double cohesionWeight;
+    private int boidsNumber;
     private final double width;
     private final double height;
     private final double maxSpeed;
@@ -33,18 +34,21 @@ public class BoidsModel {
         this.maxSpeed = maxSpeed;
         this.perceptionRadius = perceptionRadius;
         this.avoidRadius = avoidRadius;
-        
-    	boids = new ArrayList<>();
-        for (int i = 0; i < nboids; i++) {
-        	P2d pos = new P2d(-width/2 + Math.random() * width, -height/2 + Math.random() * height);
-        	V2d vel = new V2d(Math.random() * maxSpeed/2 - maxSpeed/4, Math.random() * maxSpeed/2 - maxSpeed/4);
-        	boids.add(new Boid(pos, vel));
-        }
-
+        this.boidsNumber = nboids;
+    	this.boids = new ArrayList<>();
     }
     
     public List<Boid> getBoids(){
     	return boids;
+    }
+
+    public synchronized void setBoids(final int boidsNumber) {
+        for (int i = 0; i < boidsNumber; i++) {
+            P2d pos = new P2d(-width/2 + Math.random() * width, -height/2 + Math.random() * height);
+            V2d vel = new V2d(Math.random() * maxSpeed/2 - maxSpeed/4, Math.random() * maxSpeed/2 - maxSpeed/4);
+            this.boids.add(new Boid(pos, vel));
+        }
+        this.boidsNumber = boidsNumber;
     }
     
     public double getMinX() {

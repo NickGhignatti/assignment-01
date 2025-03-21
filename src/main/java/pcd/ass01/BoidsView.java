@@ -77,7 +77,8 @@ public class BoidsView implements ChangeListener {
         var boidsNumberInput = new JTextField(String.valueOf(model.getBoids().size()), 10);
         boidsNumberInput.addActionListener((e) -> {
             boidsNumberInput.setEditable(false);
-//            model.setBoids(Integer.parseInt(boidsNumberInput.getText()));
+            this.model.setBoids(Integer.parseInt(boidsNumberInput.getText()));
+            this.simulator.resume();
         });
         var resumeButton = new JButton("START");
         resumeButton.addActionListener((e) -> {

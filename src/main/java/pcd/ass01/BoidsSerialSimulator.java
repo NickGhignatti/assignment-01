@@ -7,7 +7,7 @@ public class BoidsSerialSimulator implements BoidsSimulator {
 
     private int framerate;
     private boolean isRunning;
-    private BoidsModel model;
+    private final BoidsModel model;
     private Optional<BoidsView> view;
 
     public BoidsSerialSimulator(BoidsModel model) {
@@ -40,11 +40,11 @@ public class BoidsSerialSimulator implements BoidsSimulator {
             	view.get().update(framerate);
             	var t1 = System.currentTimeMillis();
                 var dtElapsed = t1 - t0;
-                var framratePeriod = 1000/FRAMERATE;
+                var frameratePeriod = 1000/FRAMERATE;
                 
-                if (dtElapsed < framratePeriod) {		
+                if (dtElapsed < frameratePeriod) {
                 	try {
-                		Thread.sleep(framratePeriod - dtElapsed);
+                		Thread.sleep(frameratePeriod - dtElapsed);
                 	} catch (Exception ignored) {}
                 	framerate = FRAMERATE;
                 } else {

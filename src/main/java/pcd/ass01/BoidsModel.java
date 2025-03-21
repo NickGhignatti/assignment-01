@@ -17,8 +17,7 @@ public class BoidsModel {
     private final double perceptionRadius;
     private final double avoidRadius;
 
-    public BoidsModel(int nboids,  
-    						double initialSeparationWeight, 
+    public BoidsModel(double initialSeparationWeight,
     						double initialAlignmentWeight, 
     						double initialCohesionWeight,
     						double width, 
@@ -31,11 +30,15 @@ public class BoidsModel {
         cohesionWeight = initialCohesionWeight;
         this.width = width;
         this.height = height;
+        this.boidsNumber = 0;
         this.maxSpeed = maxSpeed;
-        this.perceptionRadius = perceptionRadius;
         this.avoidRadius = avoidRadius;
-        this.boidsNumber = nboids;
     	this.boids = new ArrayList<>();
+        this.perceptionRadius = perceptionRadius;
+    }
+
+    public int getBoidsNumber() {
+        return this.boidsNumber;
     }
     
     public List<Boid> getBoids(){

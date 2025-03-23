@@ -10,14 +10,14 @@ public class BoidsSerialSimulator implements BoidsSimulator {
     private final BoidsModel model;
     private Optional<BoidsView> view;
 
-    public BoidsSerialSimulator(BoidsModel model) {
+    public BoidsSerialSimulator(final BoidsModel model) {
         this.model = model;
         this.isRunning = false;
         this.view = Optional.empty();
     }
 
     @Override
-    public void attachView(BoidsView view) {
+    public void attachView(final BoidsView view) {
     	this.view = Optional.of(view);
     }
 
@@ -27,7 +27,6 @@ public class BoidsSerialSimulator implements BoidsSimulator {
             var t0 = System.currentTimeMillis();
             if (this.isRunning) {
                 var boids = model.getBoids();
-
                 for (Boid boid : boids) {
                     boid.updateVelocity(model);
                 }
@@ -51,7 +50,6 @@ public class BoidsSerialSimulator implements BoidsSimulator {
                 	framerate = (int) (1000/dtElapsed);
                 }
     		}
-            
     	}
     }
 

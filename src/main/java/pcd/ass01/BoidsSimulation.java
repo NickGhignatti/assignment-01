@@ -25,7 +25,7 @@ public class BoidsSimulation {
     					MAX_SPEED,
     					PERCEPTION_RADIUS,
     					AVOID_RADIUS); 
-    	var sim = new BoidsSerialSimulator(model);
+    	var sim = new BoidsTaskExecutorSimulator(model);
     	var view = new BoidsView(model, SCREEN_WIDTH, SCREEN_HEIGHT, sim);
     	sim.attachView(view);
     	sim.runSimulation();

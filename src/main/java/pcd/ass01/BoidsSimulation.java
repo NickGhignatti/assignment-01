@@ -2,8 +2,6 @@ package pcd.ass01;
 
 public class BoidsSimulation {
 
-	final static int N_BOIDS = 1500;
-
 	final static double SEPARATION_WEIGHT = 1.0;
     final static double ALIGNMENT_WEIGHT = 1.0;
     final static double COHESION_WEIGHT = 1.0;
@@ -16,7 +14,6 @@ public class BoidsSimulation {
 
 	final static int SCREEN_WIDTH = 800; 
 	final static int SCREEN_HEIGHT = 800; 
-	
 
     public static void main(String[] args) {      
     	var model = new BoidsModel(

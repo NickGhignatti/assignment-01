@@ -1,5 +1,7 @@
 package pcd.ass01;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -8,7 +10,9 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator{
     private static final int FRAMERATE = 25;
 
     private int framerate;
+    private List<Boid> boids;
     private Boolean isRunning;
+    private Boolean isFirstTime;
     private CyclicBarrier barrier;
     private Optional<BoidsView> view;
     private final BoidsModel model;
@@ -16,7 +20,9 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator{
     public BoidsVirtualThreadSimulator(final BoidsModel model) {
         this.model = model;
         this.isRunning = false;
+        this.isFirstTime = true;
         this.view = Optional.empty();
+        this.boids = new ArrayList<>();
     }
 
     @Override
@@ -29,17 +35,20 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator{
         while (true) {
             var t0 = System.currentTimeMillis();
             if (this.isRunning) {
-                this.barrier = new CyclicBarrier(this.model.getBoidsNumber());
-                var boids = model.getBoids();
+                if (this.isFirstTime) {
+                    this.isFirstTime = false;
+                    this.barrier = new CyclicBarrier(this.model.getBoidsNumber());
+                    boids = model.getBoids();
+                }
                 for (final Boid b: boids) {
                     Thread.startVirtualThread(() -> {
-                        b.updateVelocity(this.model);
                         try {
+                            b.updateVelocity(this.model);
                             barrier.await();
+                            b.updatePos(this.model);
                         } catch (InterruptedException | BrokenBarrierException e) {
                             throw new RuntimeException(e);
                         }
-                        b.updatePos(this.model);
                     });
                 }
             }

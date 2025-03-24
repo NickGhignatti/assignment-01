@@ -6,6 +6,8 @@ import javax.swing.event.ChangeListener;
 
 import java.awt.*;
 import java.util.Hashtable;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 public class BoidsView implements ChangeListener {
 
@@ -15,7 +17,7 @@ public class BoidsView implements ChangeListener {
 	private final BoidsModel model;
 	private final int width, height;
     private final BoidsSimulator simulator;
-	
+
 	public BoidsView(final BoidsModel model, final int width, final int height, final BoidsSimulator simulator) {
 		this.model = model;
 		this.width = width;
@@ -99,8 +101,8 @@ public class BoidsView implements ChangeListener {
         return inputPanel;
     }
 	
-	public void update(int frameRate) {
-		boidsPanel.setFrameRate(frameRate);
+	public void update(final int frameRate) {
+        boidsPanel.setFrameRate(frameRate);
 		boidsPanel.repaint();
 	}
 

@@ -13,6 +13,7 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
     private List<Boid> boids;
     private Boolean isRunning;
     private Boolean isFirstTime;
+    private List<Thread> threadPool;
     private Optional<BoidsView> view;
     private final BoidsModel model;
     private final CyclicBarrier barrier;
@@ -25,6 +26,7 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
         this.isFirstTime = true;
         this.view = Optional.empty();
         this.boids = new ArrayList<>();
+        this.threadPool = new ArrayList<>();
         this.numberOfProcessors = Runtime.getRuntime().availableProcessors() + 1;
         this.barrier = new CyclicBarrier(this.numberOfProcessors);
         this.updateBarrier = new CyclicBarrier(this.numberOfProcessors + 1);
@@ -38,7 +40,6 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
     @Override
     public void runSimulation() {
         List<Integer> indexes = new ArrayList<>();
-        var threadPool = new Thread[this.numberOfProcessors];
 
         while (true) {
             var t0 = System.currentTimeMillis();
@@ -54,9 +55,14 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
 
                 for (int i = 0; i < this.numberOfProcessors; i++) {
                     final var finalI = i;
-                    threadPool[i] = new Thread(() -> {
+                    threadPool.add(new Thread(() -> {
                         var boidsToCompute = boids.subList(indexes.get(finalI), indexes.get(finalI + 1));
-                        while (this.isRunning) {
+                        while (true) {
+                            try {
+                                this.updateBarrier.await();
+                            } catch (InterruptedException | BrokenBarrierException e) {
+                                throw new RuntimeException(e);
+                            }
                             try {
                                 for (final Boid b : boidsToCompute)
                                     b.updateVelocity(this.model);
@@ -67,15 +73,9 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
                             } catch (InterruptedException | BrokenBarrierException e) {
                                 throw new RuntimeException(e);
                             }
-
-                            try {
-                                this.updateBarrier.await();
-                            } catch (InterruptedException | BrokenBarrierException e) {
-                                throw new RuntimeException(e);
-                            }
                         }
-                    });
-                    threadPool[i].start();
+                    }));
+                    threadPool.get(i).start();
                 }
             }
             this.view.ifPresent(boidsView -> {
@@ -111,6 +111,5 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
     @Override
     public void stop() {
         this.isRunning = false;
-        this.isFirstTime = true;
     }
 }

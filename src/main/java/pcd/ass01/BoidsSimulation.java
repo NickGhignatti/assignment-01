@@ -1,7 +1,6 @@
 package pcd.ass01;
 
 public class BoidsSimulation {
-
 	final static double SEPARATION_WEIGHT = 1.0;
     final static double ALIGNMENT_WEIGHT = 1.0;
     final static double COHESION_WEIGHT = 1.0;
@@ -22,7 +21,7 @@ public class BoidsSimulation {
     					MAX_SPEED,
     					PERCEPTION_RADIUS,
     					AVOID_RADIUS);
-    	var sim = new BoidsPlatformThreadSimulator(model);
+    	var sim = new BoidsTaskExecutorSimulator(model);
     	var view = new BoidsView(model, SCREEN_WIDTH, SCREEN_HEIGHT, sim);
     	sim.attachView(view);
     	sim.runSimulation();

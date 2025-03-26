@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-public class BoidsVirtualThreadSimulator implements BoidsSimulator{
+public class BoidsVirtualThreadSimulator implements BoidsSimulator {
     private static final int FRAMERATE = 25;
 
     private int framerate;
@@ -15,6 +15,7 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator{
     private Boolean isFirstTime;
     private CyclicBarrier barrier;
     private Optional<BoidsView> view;
+    private CyclicBarrier updateBarrier;
     private final BoidsModel model;
 
     public BoidsVirtualThreadSimulator(final BoidsModel model) {
@@ -34,41 +35,52 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator{
     public void runSimulation() {
         while (true) {
             var t0 = System.currentTimeMillis();
-            if (this.isRunning) {
-                if (this.isFirstTime) {
-                    this.isFirstTime = false;
-                    this.barrier = new CyclicBarrier(this.model.getBoidsNumber());
-                    boids = model.getBoids();
-                }
-                for (final Boid b: boids) {
+            if (this.isFirstTime && this.isRunning) {
+                this.isFirstTime = false;
+                this.barrier = new CyclicBarrier(this.model.getBoidsNumber());
+                this.updateBarrier = new CyclicBarrier(this.model.getBoidsNumber() + 1);
+                boids = model.getBoids();
+                for (final Boid b : boids) {
                     Thread.startVirtualThread(() -> {
-                        try {
-                            b.updateVelocity(this.model);
-                            barrier.await();
-                            b.updatePos(this.model);
-                        } catch (InterruptedException | BrokenBarrierException e) {
-                            throw new RuntimeException(e);
+                        while (true) {
+                            try {
+                                this.updateBarrier.await();
+                                b.updateVelocity(this.model);
+                                barrier.await();
+                                b.updatePos(this.model);
+                            } catch (InterruptedException | BrokenBarrierException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
                     });
                 }
             }
 
-            if (view.isPresent()) {
-                view.get().update(framerate);
-                var t1 = System.currentTimeMillis();
-                var dtElapsed = t1 - t0;
-                var frameratePeriod = 1000 / FRAMERATE;
-
-                if (dtElapsed < frameratePeriod) {
+            this.view.ifPresent(boidsView -> {
+                if (this.isRunning) {
                     try {
-                        Thread.sleep(frameratePeriod - dtElapsed);
-                    } catch (Exception ignored) {
+                        this.updateBarrier.await();
+                    } catch (InterruptedException | BrokenBarrierException e) {
+                        throw new RuntimeException(e);
                     }
-                    framerate = FRAMERATE;
-                } else {
-                    framerate = (int) (1000 / dtElapsed);
                 }
+                boidsView.update(framerate);
+            });
+
+            var t1 = System.currentTimeMillis();
+            var dtElapsed = t1 - t0;
+            var frameratePeriod = 1000 / FRAMERATE;
+
+            if (dtElapsed < frameratePeriod) {
+                try {
+                    Thread.sleep(frameratePeriod - dtElapsed);
+                } catch (Exception ignored) {
+                }
+                framerate = FRAMERATE;
+            } else {
+                framerate = (int) (1000 / dtElapsed);
             }
+
         }
     }
 

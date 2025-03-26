@@ -18,6 +18,7 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
     private final CyclicBarrier barrier;
     private final int numberOfProcessors;
     private final List<Runnable> workers;
+    private final CyclicBarrier updateBarrier;
 
     public BoidsTaskExecutorSimulator(final BoidsModel model) {
         this.model = model;
@@ -27,6 +28,7 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
         this.workers = new ArrayList<>();
         this.numberOfProcessors = Runtime.getRuntime().availableProcessors() + 1;
         this.barrier = new CyclicBarrier(this.numberOfProcessors);
+        this.updateBarrier = new CyclicBarrier(this.numberOfProcessors + 1);
     }
 
     @Override
@@ -43,16 +45,19 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
         indexes.add(this.model.getBoidsNumber());
         var boids = this.model.getBoids();
         for (int i = 0; i < this.numberOfProcessors; i++) {
-            final int finalI = i;
+            final var currentBoids = boids.subList(indexes.get(i), indexes.get(i + 1));
             this.workers.add(() -> {
-                for (final Boid b: boids.subList(indexes.get(finalI), indexes.get(finalI + 1))) {
-                    b.updateVelocity(this.model);
-                    try {
-                        this.barrier.await();
-                    } catch (InterruptedException | BrokenBarrierException e) {
-                        throw new RuntimeException(e);
+                try {
+                    this.updateBarrier.await();
+                    for (final Boid b : currentBoids) {
+                        b.updateVelocity(this.model);
                     }
-                    b.updatePos(this.model);
+                    this.barrier.await();
+                    for (final Boid b : currentBoids) {
+                        b.updatePos(this.model);
+                    }
+                } catch (InterruptedException | BrokenBarrierException e) {
+                    throw new RuntimeException(e);
                 }
             });
         }
@@ -63,32 +68,38 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
         var executor = Executors.newFixedThreadPool(this.numberOfProcessors);
         while (true) {
             var t0 = System.currentTimeMillis();
-            if (this.isRunning) {
-                if (this.isFirstTime) {
-                    this.isFirstTime = false;
-                    initThread();
-                }
-                for (final Runnable t: workers) {
-                    executor.execute(t);
-                }
+            if (this.isFirstTime && this.isRunning) {
+                this.isFirstTime = false;
+                initThread();
+            }
+            for (final Runnable t : workers) {
+                executor.execute(t);
             }
 
-            if (view.isPresent()) {
-                view.get().update(framerate);
-                var t1 = System.currentTimeMillis();
-                var dtElapsed = t1 - t0;
-                var frameratePeriod = 1000 / FRAMERATE;
-
-                if (dtElapsed < frameratePeriod) {
+            view.ifPresent(boidsView -> {
+                if (this.isRunning) {
                     try {
-                        Thread.sleep(frameratePeriod - dtElapsed);
-                    } catch (Exception ignored) {
+                        this.updateBarrier.await();
+                    } catch (InterruptedException | BrokenBarrierException e) {
+                        throw new RuntimeException(e);
                     }
-                    framerate = FRAMERATE;
-                } else {
-                    framerate = (int) (1000 / dtElapsed);
                 }
+                boidsView.update(framerate);
+            });
+
+            var dtElapsed = System.currentTimeMillis() - t0;
+            var frameratePeriod = 1000 / FRAMERATE;
+
+            if (dtElapsed < frameratePeriod) {
+                try {
+                    Thread.sleep(frameratePeriod - dtElapsed);
+                } catch (Exception ignored) {
+                }
+                framerate = FRAMERATE;
+            } else {
+                framerate = (int) (1000 / dtElapsed);
             }
+
         }
     }
 

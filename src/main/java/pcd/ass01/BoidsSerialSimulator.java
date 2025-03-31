@@ -61,6 +61,7 @@ public class BoidsSerialSimulator implements BoidsSimulator {
     @Override
     public void reset() {
         this.isRunning = false;
+        this.model.clearBoids();
     }
 
     @Override

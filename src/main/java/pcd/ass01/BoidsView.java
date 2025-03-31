@@ -101,6 +101,7 @@ public class BoidsView implements ChangeListener {
         resetButton.addActionListener((_) -> {
             if (!boidsNumberInput.isEditable() && this.model.boidsHaveBeenSet()) {
 				boidsNumberInput.setEditable(true);
+				boidsNumberInput.setText("0");
                 this.simulator.reset();
 				this.boidsPanel.repaint();
             }

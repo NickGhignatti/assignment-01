@@ -29,7 +29,7 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
         this.numberOfProcessors = Runtime.getRuntime().availableProcessors() + 1;
         this.barrier = new CyclicBarrier(this.numberOfProcessors);
         this.updateBarrier = new CyclicBarrier(this.numberOfProcessors + 1);
-        this.resetThread = true;
+        this.resetThread = false;
     }
 
     @Override
@@ -75,12 +75,18 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
     public void reset() {
         this.isRunning = false;
         this.resetThread = true;
+        try {
+            this.updateBarrier.await();
+        } catch (InterruptedException | BrokenBarrierException e) {
+            throw new RuntimeException(e);
+        }
         this.threadPool = new ArrayList<>();
         this.model.clearBoids();
     }
 
     @Override
     public void start() {
+        this.resetThread = false;
         this.isRunning = true;
         List<Integer> indexes = new ArrayList<>();
         int step = this.model.getBoidsNumber() / this.numberOfProcessors;
@@ -94,7 +100,7 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
             final var finalI = i;
             threadPool.add(new Thread(() -> {
                 var boidsToCompute = boids.subList(indexes.get(finalI), indexes.get(finalI + 1));
-                while (this.resetThread) {
+                while (!this.resetThread) {
                     try {
                         this.updateBarrier.await();
                         for (final Boid b : boidsToCompute)
@@ -106,6 +112,7 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
                         throw new RuntimeException(e);
                     }
                 }
+                System.out.println(Thread.currentThread().getName());
             }));
             threadPool.get(i).start();
         }

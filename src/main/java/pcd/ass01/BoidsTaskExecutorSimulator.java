@@ -104,12 +104,17 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
     }
 
     @Override
-    public void resume() {
-        this.isRunning = true;
+    public void resumeStop() {
+        this.isRunning = !this.isRunning;
     }
 
     @Override
-    public void stop() {
+    public void reset() {
         this.isRunning = false;
+    }
+
+    @Override
+    public void start() {
+        this.isRunning = true;
     }
 }

@@ -60,16 +60,11 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
                         while (true) {
                             try {
                                 this.updateBarrier.await();
-                            } catch (InterruptedException | BrokenBarrierException e) {
-                                throw new RuntimeException(e);
-                            }
-                            try {
                                 for (final Boid b : boidsToCompute)
                                     b.updateVelocity(this.model);
                                 this.barrier.await();
                                 for (final Boid b : boidsToCompute)
                                     b.updatePos(this.model);
-
                             } catch (InterruptedException | BrokenBarrierException e) {
                                 throw new RuntimeException(e);
                             }
@@ -104,12 +99,17 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
     }
 
     @Override
-    public void resume() {
-        this.isRunning = true;
+    public void resumeStop() {
+        this.isRunning = !this.isRunning;
     }
 
     @Override
-    public void stop() {
+    public void reset() {
         this.isRunning = false;
+    }
+
+    @Override
+    public void start() {
+        this.isRunning = true;
     }
 }

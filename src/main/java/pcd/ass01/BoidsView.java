@@ -6,8 +6,6 @@ import javax.swing.event.ChangeListener;
 
 import java.awt.*;
 import java.util.Hashtable;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 
 public class BoidsView implements ChangeListener {
 
@@ -79,19 +77,20 @@ public class BoidsView implements ChangeListener {
         var boidsNumberInput = new JTextField(String.valueOf(model.getBoids().size()), 10);
         boidsNumberInput.addActionListener((e) -> {
             boidsNumberInput.setEditable(false);
-            this.model.setBoids(Integer.parseInt(boidsNumberInput.getText()));
-            this.simulator.resume();
         });
         var resumeButton = new JButton("START");
         resumeButton.addActionListener((e) -> {
             if (!boidsNumberInput.isEditable()) {
-                this.simulator.resume();
+                if (!this.model.boidsHaveBeenSet()) {
+                    this.model.setBoids(Integer.parseInt(boidsNumberInput.getText()));
+                    this.simulator.start();
+                }
             }
         });
-        var stopButton = new JButton("STOP");
+        var stopButton = new JButton("RESUME/STOP");
         stopButton.addActionListener((e) -> {
-            if (!boidsNumberInput.isEditable()) {
-                this.simulator.stop();
+            if (!boidsNumberInput.isEditable() && this.model.boidsHaveBeenSet()) {
+                this.simulator.resumeStop();
             }
         });
 

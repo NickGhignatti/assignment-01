@@ -12,7 +12,6 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
     private int framerate;
     private List<Boid> boids;
     private Boolean isRunning;
-    private Boolean isFirstTime;
     private CyclicBarrier barrier;
     private Optional<BoidsView> view;
     private CyclicBarrier updateBarrier;
@@ -21,7 +20,6 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
     public BoidsVirtualThreadSimulator(final BoidsModel model) {
         this.model = model;
         this.isRunning = false;
-        this.isFirstTime = true;
         this.view = Optional.empty();
         this.boids = new ArrayList<>();
     }
@@ -35,27 +33,6 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
     public void runSimulation() {
         while (true) {
             var t0 = System.currentTimeMillis();
-            if (this.isFirstTime && this.isRunning) {
-                this.isFirstTime = false;
-                this.barrier = new CyclicBarrier(this.model.getBoidsNumber());
-                this.updateBarrier = new CyclicBarrier(this.model.getBoidsNumber() + 1);
-                boids = model.getBoids();
-                for (final Boid b : boids) {
-                    Thread.startVirtualThread(() -> {
-                        while (true) {
-                            try {
-                                this.updateBarrier.await();
-                                b.updateVelocity(this.model);
-                                barrier.await();
-                                b.updatePos(this.model);
-                            } catch (InterruptedException | BrokenBarrierException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    });
-                }
-            }
-
             this.view.ifPresent(boidsView -> {
                 if (this.isRunning) {
                     try {
@@ -97,5 +74,22 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
     @Override
     public void start() {
         this.isRunning = true;
+        this.barrier = new CyclicBarrier(this.model.getBoidsNumber());
+        this.updateBarrier = new CyclicBarrier(this.model.getBoidsNumber() + 1);
+        boids = model.getBoids();
+        for (final Boid b : boids) {
+            Thread.startVirtualThread(() -> {
+                while (true) {
+                    try {
+                        this.updateBarrier.await();
+                        b.updateVelocity(this.model);
+                        barrier.await();
+                        b.updatePos(this.model);
+                    } catch (InterruptedException | BrokenBarrierException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        }
     }
 }

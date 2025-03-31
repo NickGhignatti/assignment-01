@@ -68,10 +68,6 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
         var executor = Executors.newFixedThreadPool(this.numberOfProcessors);
         while (true) {
             var t0 = System.currentTimeMillis();
-            if (this.isFirstTime && this.isRunning) {
-                this.isFirstTime = false;
-                initThread();
-            }
             for (final Runnable t : workers) {
                 executor.execute(t);
             }
@@ -116,5 +112,6 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
     @Override
     public void start() {
         this.isRunning = true;
+        initThread();
     }
 }

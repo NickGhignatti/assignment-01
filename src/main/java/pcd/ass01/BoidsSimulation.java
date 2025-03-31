@@ -14,16 +14,16 @@ public class BoidsSimulation {
 	final static int SCREEN_WIDTH = 800; 
 	final static int SCREEN_HEIGHT = 800; 
 
-    public static void main(String[] args) {      
+    public static void main(String[] args) {    
     	var model = new BoidsModel(
     					SEPARATION_WEIGHT, ALIGNMENT_WEIGHT, COHESION_WEIGHT, 
     					ENVIRONMENT_WIDTH, ENVIRONMENT_HEIGHT,
     					MAX_SPEED,
     					PERCEPTION_RADIUS,
     					AVOID_RADIUS);
-    	var sim = new BoidsPlatformThreadSimulator(model);
+    	var sim = new BoidsVirtualThreadSimulator(model);
     	var view = new BoidsView(model, SCREEN_WIDTH, SCREEN_HEIGHT, sim);
     	sim.attachView(view);
     	sim.runSimulation();
-    }
+	}
 }

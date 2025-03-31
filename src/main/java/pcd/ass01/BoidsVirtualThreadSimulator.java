@@ -16,12 +16,14 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
     private Optional<BoidsView> view;
     private CyclicBarrier updateBarrier;
     private final BoidsModel model;
+    private Boolean resetThread;
 
     public BoidsVirtualThreadSimulator(final BoidsModel model) {
         this.model = model;
         this.isRunning = false;
         this.view = Optional.empty();
         this.boids = new ArrayList<>();
+        this.resetThread = false;
     }
 
     @Override
@@ -69,21 +71,29 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
     @Override
     public void reset() {
         this.isRunning = false;
+        try {
+            this.updateBarrier.await();
+        } catch (InterruptedException | BrokenBarrierException e) {
+            throw new RuntimeException(e);
+        }
+        this.resetThread = true;
+        this.model.clearBoids();
     }
 
     @Override
     public void start() {
         this.isRunning = true;
+        this.resetThread = false;
         this.barrier = new CyclicBarrier(this.model.getBoidsNumber());
         this.updateBarrier = new CyclicBarrier(this.model.getBoidsNumber() + 1);
         boids = model.getBoids();
         for (final Boid b : boids) {
             Thread.startVirtualThread(() -> {
-                while (true) {
+                while (!this.resetThread) {
                     try {
                         this.updateBarrier.await();
                         b.updateVelocity(this.model);
-                        barrier.await();
+                        this.barrier.await();
                         b.updatePos(this.model);
                     } catch (InterruptedException | BrokenBarrierException e) {
                         throw new RuntimeException(e);

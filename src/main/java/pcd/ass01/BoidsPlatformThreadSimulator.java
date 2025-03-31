@@ -112,7 +112,6 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
                         throw new RuntimeException(e);
                     }
                 }
-                System.out.println(Thread.currentThread().getName());
             }));
             threadPool.get(i).start();
         }

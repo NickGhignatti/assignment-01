@@ -5,7 +5,7 @@ import java.util.List;
 
 public class BoidsModel {
     
-    private final List<Boid> boids;
+    private List<Boid> boids;
     private double separationWeight; 
     private double alignmentWeight; 
     private double cohesionWeight;
@@ -48,6 +48,11 @@ public class BoidsModel {
 
     public Boolean boidsHaveBeenSet() {
         return this.boidsHaveBeenSet;
+    }
+
+    public synchronized void clearBoids() {
+        this.boidsHaveBeenSet = false;
+        this.boids = new ArrayList<>();
     }
 
     public synchronized void setBoids(final int boidsNumber) {

@@ -18,6 +18,7 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
     private final CyclicBarrier barrier;
     private final int numberOfProcessors;
     private final CyclicBarrier updateBarrier;
+    private Boolean resetThread;
 
     public BoidsPlatformThreadSimulator(final BoidsModel model) {
         this.model = model;
@@ -28,6 +29,7 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
         this.numberOfProcessors = Runtime.getRuntime().availableProcessors() + 1;
         this.barrier = new CyclicBarrier(this.numberOfProcessors);
         this.updateBarrier = new CyclicBarrier(this.numberOfProcessors + 1);
+        this.resetThread = true;
     }
 
     @Override
@@ -72,6 +74,9 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
     @Override
     public void reset() {
         this.isRunning = false;
+        this.resetThread = true;
+        this.threadPool = new ArrayList<>();
+        this.model.clearBoids();
     }
 
     @Override
@@ -89,7 +94,7 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
             final var finalI = i;
             threadPool.add(new Thread(() -> {
                 var boidsToCompute = boids.subList(indexes.get(finalI), indexes.get(finalI + 1));
-                while (true) {
+                while (this.resetThread) {
                     try {
                         this.updateBarrier.await();
                         for (final Boid b : boidsToCompute)

@@ -75,11 +75,14 @@ public class BoidsView implements ChangeListener {
     private JPanel getInputePanel(final BoidsModel model) {
         JPanel inputPanel = new JPanel();
         var boidsNumberInput = new JTextField(String.valueOf(model.getBoids().size()), 10);
-        boidsNumberInput.addActionListener((e) -> {
-            boidsNumberInput.setEditable(false);
+        boidsNumberInput.addActionListener((_) -> {
+			if (boidsNumberInput.isEditable()) {
+			
+				boidsNumberInput.setEditable(false);
+			}
         });
         var resumeButton = new JButton("START");
-        resumeButton.addActionListener((e) -> {
+        resumeButton.addActionListener((_) -> {
             if (!boidsNumberInput.isEditable()) {
                 if (!this.model.boidsHaveBeenSet()) {
                     this.model.setBoids(Integer.parseInt(boidsNumberInput.getText()));
@@ -88,14 +91,24 @@ public class BoidsView implements ChangeListener {
             }
         });
         var stopButton = new JButton("RESUME/STOP");
-        stopButton.addActionListener((e) -> {
+        stopButton.addActionListener((_) -> {
             if (!boidsNumberInput.isEditable() && this.model.boidsHaveBeenSet()) {
                 this.simulator.resumeStop();
             }
         });
 
+        var resetButton = new JButton("RESET");
+        resetButton.addActionListener((_) -> {
+            if (!boidsNumberInput.isEditable() && this.model.boidsHaveBeenSet()) {
+				boidsNumberInput.setEditable(true);
+                this.simulator.reset();
+				this.boidsPanel.repaint();
+            }
+        });
+
         inputPanel.add(resumeButton);
         inputPanel.add(stopButton);
+		inputPanel.add(resetButton);
         inputPanel.add(boidsNumberInput);
         return inputPanel;
     }

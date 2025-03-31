@@ -12,18 +12,16 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
 
     private int framerate;
     private Boolean isRunning;
-    private Boolean isFirstTime;
     private Optional<BoidsView> view;
     private final BoidsModel model;
     private final CyclicBarrier barrier;
     private final int numberOfProcessors;
-    private final List<Runnable> workers;
+    private List<Runnable> workers;
     private final CyclicBarrier updateBarrier;
 
     public BoidsTaskExecutorSimulator(final BoidsModel model) {
         this.model = model;
         this.isRunning = false;
-        this.isFirstTime = true;
         this.view = Optional.empty();
         this.workers = new ArrayList<>();
         this.numberOfProcessors = Runtime.getRuntime().availableProcessors() + 1;
@@ -107,6 +105,8 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
     @Override
     public void reset() {
         this.isRunning = false;
+        this.workers = new ArrayList<>();
+        this.model.clearBoids();
     }
 
     @Override

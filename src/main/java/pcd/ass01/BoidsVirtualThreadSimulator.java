@@ -12,11 +12,11 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
     private int framerate;
     private List<Boid> boids;
     private Boolean isRunning;
+    private Boolean resetThread;
     private CyclicBarrier barrier;
     private Optional<BoidsView> view;
     private CyclicBarrier updateBarrier;
     private final BoidsModel model;
-    private Boolean resetThread;
 
     public BoidsVirtualThreadSimulator(final BoidsModel model) {
         this.model = model;

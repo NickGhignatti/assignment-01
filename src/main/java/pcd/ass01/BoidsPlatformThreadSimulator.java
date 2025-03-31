@@ -12,13 +12,13 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
     private int framerate;
     private List<Boid> boids;
     private Boolean isRunning;
+    private Boolean resetThread;
     private List<Thread> threadPool;
     private Optional<BoidsView> view;
     private final BoidsModel model;
     private final CyclicBarrier barrier;
     private final int numberOfProcessors;
     private final CyclicBarrier updateBarrier;
-    private Boolean resetThread;
 
     public BoidsPlatformThreadSimulator(final BoidsModel model) {
         this.model = model;

@@ -12,11 +12,11 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
 
     private int framerate;
     private Boolean isRunning;
+    private List<Runnable> workers;
     private Optional<BoidsView> view;
     private final BoidsModel model;
     private final CyclicBarrier barrier;
     private final int numberOfProcessors;
-    private List<Runnable> workers;
     private final CyclicBarrier updateBarrier;
 
     public BoidsTaskExecutorSimulator(final BoidsModel model) {

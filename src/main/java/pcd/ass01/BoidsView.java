@@ -77,7 +77,6 @@ public class BoidsView implements ChangeListener {
         var boidsNumberInput = new JTextField(String.valueOf(model.getBoids().size()), 10);
         boidsNumberInput.addActionListener((_) -> {
 			if (boidsNumberInput.isEditable()) {
-			
 				boidsNumberInput.setEditable(false);
 			}
         });
@@ -85,7 +84,13 @@ public class BoidsView implements ChangeListener {
         resumeButton.addActionListener((_) -> {
             if (!boidsNumberInput.isEditable()) {
                 if (!this.model.boidsHaveBeenSet()) {
-                    this.model.setBoids(Integer.parseInt(boidsNumberInput.getText()));
+					try { 
+                   		this.model.setBoids(Integer.parseInt(boidsNumberInput.getText()));
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(frame, "Inserisci un numero valido.", "Errore", JOptionPane.ERROR_MESSAGE);
+                        boidsNumberInput.setEditable(true);
+						return;
+                    };
                     this.simulator.start();
                 }
             }

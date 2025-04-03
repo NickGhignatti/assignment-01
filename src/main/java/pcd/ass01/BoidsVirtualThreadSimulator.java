@@ -13,9 +13,9 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
     private List<Boid> boids;
     private Boolean isRunning;
     private Boolean resetThread;
-    private CyclicBarrier barrier;
+    private BoidsBarrier barrier;
     private Optional<BoidsView> view;
-    private CyclicBarrier updateBarrier;
+    private BoidsBarrier updateBarrier;
     private final BoidsModel model;
 
     public BoidsVirtualThreadSimulator(final BoidsModel model) {
@@ -39,7 +39,7 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
                 if (this.isRunning) {
                     try {
                         this.updateBarrier.await();
-                    } catch (InterruptedException | BrokenBarrierException e) {
+                    } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -71,11 +71,10 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
     @Override
     public void reset() {
         this.isRunning = false;
-        try {
-            this.updateBarrier.await();
-        } catch (InterruptedException | BrokenBarrierException e) {
-            throw new RuntimeException(e);
-        }
+
+        this.updateBarrier.breakBarrier();
+        this.barrier.breakBarrier();
+
         this.resetThread = true;
         this.model.clearBoids();
     }
@@ -84,8 +83,8 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
     public void start() {
         this.isRunning = true;
         this.resetThread = false;
-        this.barrier = new CyclicBarrier(this.model.getBoidsNumber());
-        this.updateBarrier = new CyclicBarrier(this.model.getBoidsNumber() + 1);
+        this.barrier = new BoidsBarrier(this.model.getBoidsNumber());
+        this.updateBarrier = new BoidsBarrier(this.model.getBoidsNumber() + 1);
         boids = model.getBoids();
         for (final Boid b : boids) {
             Thread.startVirtualThread(() -> {
@@ -95,7 +94,7 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
                         b.updateVelocity(this.model);
                         this.barrier.await();
                         b.updatePos(this.model);
-                    } catch (InterruptedException | BrokenBarrierException e) {
+                    } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }

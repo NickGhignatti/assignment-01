@@ -15,9 +15,9 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
     private List<Runnable> workers;
     private Optional<BoidsView> view;
     private final BoidsModel model;
-    private final CyclicBarrier barrier;
+    private final BoidsBarrier barrier;
     private final int numberOfProcessors;
-    private final CyclicBarrier updateBarrier;
+    private final BoidsBarrier updateBarrier;
 
     public BoidsTaskExecutorSimulator(final BoidsModel model) {
         this.model = model;
@@ -25,8 +25,8 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
         this.view = Optional.empty();
         this.workers = new ArrayList<>();
         this.numberOfProcessors = Runtime.getRuntime().availableProcessors() + 1;
-        this.barrier = new CyclicBarrier(this.numberOfProcessors);
-        this.updateBarrier = new CyclicBarrier(this.numberOfProcessors + 1);
+        this.barrier = new BoidsBarrier(this.numberOfProcessors);
+        this.updateBarrier = new BoidsBarrier(this.numberOfProcessors + 1);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
                     for (final Boid b : currentBoids) {
                         b.updatePos(this.model);
                     }
-                } catch (InterruptedException | BrokenBarrierException e) {
+                } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             });
@@ -74,7 +74,7 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
                 if (this.isRunning) {
                     try {
                         this.updateBarrier.await();
-                    } catch (InterruptedException | BrokenBarrierException e) {
+                    } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -105,6 +105,10 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
     @Override
     public void reset() {
         this.isRunning = false;
+
+        this.updateBarrier.breakBarrier();
+        this.barrier.breakBarrier();
+
         this.workers = new ArrayList<>();
         this.model.clearBoids();
     }

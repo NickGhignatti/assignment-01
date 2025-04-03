@@ -86,12 +86,12 @@ public class BoidsView implements ChangeListener {
                 if (!this.model.boidsHaveBeenSet()) {
 					try { 
                    		this.model.setBoids(Integer.parseInt(boidsNumberInput.getText()));
-                    } catch (NumberFormatException ex) {
+						this.simulator.start();
+					} catch (NumberFormatException ex) {
                         JOptionPane.showMessageDialog(frame, "Inserisci un numero valido.", "Errore", JOptionPane.ERROR_MESSAGE);
                         boidsNumberInput.setEditable(true);
 						return;
                     };
-                    this.simulator.start();
                 }
             }
         });

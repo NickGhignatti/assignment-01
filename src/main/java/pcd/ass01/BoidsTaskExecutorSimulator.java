@@ -107,7 +107,7 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
         this.isRunning = false;
 
         this.updateBarrier.breakBarrier();
-        this.barrier.breakBarrier();
+//        this.barrier.breakBarrier();
 
         this.workers = new ArrayList<>();
         this.model.clearBoids();

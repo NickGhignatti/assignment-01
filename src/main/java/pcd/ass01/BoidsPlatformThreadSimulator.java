@@ -55,8 +55,7 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
             if (dtElapsed < frameratePeriod) {
                 try {
                     Thread.sleep(frameratePeriod - dtElapsed);
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
                 framerate = FRAMERATE;
             } else {
                 framerate = (int) (1000 / dtElapsed);

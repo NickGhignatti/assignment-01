@@ -5,8 +5,8 @@ import java.awt.*;
 
 public class BoidsPanel extends JPanel {
 
-	private BoidsView view; 
-	private BoidsModel model;
+	private final BoidsView view;
+	private final BoidsModel model;
     private int framerate;
 
     public BoidsPanel(BoidsView view, BoidsModel model) {
@@ -34,8 +34,8 @@ public class BoidsPanel extends JPanel {
         for (Boid boid : boids) {
         	var x = boid.getPos().x();
         	var y = boid.getPos().y();
-        	int px = (int)(w/2 + x*xScale);
-        	int py = (int)(h/2 - y*xScale);
+        	int px = (int)((double) w /2 + x*xScale);
+        	int py = (int)((double) h /2 - y*xScale);
             g.fillOval(px,py, 5, 5);
         }
         

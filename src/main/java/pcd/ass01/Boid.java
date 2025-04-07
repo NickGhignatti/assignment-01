@@ -109,7 +109,7 @@ public class Boid {
     private V2d calculateAlignment(List<Boid> nearbyBoids, BoidsModel model) {
         double avgVx = 0;
         double avgVy = 0;
-        if (nearbyBoids.size() > 0) {
+        if (!nearbyBoids.isEmpty()) {
 	        for (Boid other : nearbyBoids) {
 	        	V2d otherVel = other.getVel();
 	            avgVx += otherVel.x();
@@ -126,7 +126,7 @@ public class Boid {
     private V2d calculateCohesion(List<Boid> nearbyBoids, BoidsModel model) {
         double centerX = 0;
         double centerY = 0;
-        if (nearbyBoids.size() > 0) {
+        if (!nearbyBoids.isEmpty()) {
 	        for (Boid other: nearbyBoids) {
 	        	P2d otherPos = other.getPos();
 	            centerX += otherPos.x();

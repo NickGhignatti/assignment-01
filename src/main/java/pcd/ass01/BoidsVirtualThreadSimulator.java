@@ -44,8 +44,7 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
                 boidsView.update(framerate);
             });
 
-            var t1 = System.currentTimeMillis();
-            var dtElapsed = t1 - t0;
+            var dtElapsed = System.currentTimeMillis() - t0;
             var frameratePeriod = 1000 / FRAMERATE;
 
             if (dtElapsed < frameratePeriod) {

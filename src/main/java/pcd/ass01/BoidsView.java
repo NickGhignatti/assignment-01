@@ -62,7 +62,7 @@ public class BoidsView implements ChangeListener {
 		slider.setMinorTickSpacing(1);
 		slider.setPaintTicks(true);
 		slider.setPaintLabels(true);
-		Hashtable labelTable = new Hashtable<>();
+		var labelTable = new Hashtable<>();
 		labelTable.put( 0, new JLabel("0") );
 		labelTable.put( 10, new JLabel("1") );
 		labelTable.put( 20, new JLabel("2") );
@@ -80,21 +80,7 @@ public class BoidsView implements ChangeListener {
 				boidsNumberInput.setEditable(false);
 			}
         });
-        var resumeButton = new JButton("START");
-        resumeButton.addActionListener((_) -> {
-            if (!boidsNumberInput.isEditable()) {
-                if (!this.model.boidsHaveBeenSet()) {
-					try { 
-                   		this.model.setBoids(Integer.parseInt(boidsNumberInput.getText()));
-						this.simulator.start();
-					} catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(frame, "Inserisci un numero valido.", "Errore", JOptionPane.ERROR_MESSAGE);
-                        boidsNumberInput.setEditable(true);
-						return;
-                    };
-                }
-            }
-        });
+        var resumeButton = getJButton(boidsNumberInput);
         var stopButton = new JButton("RESUME/STOP");
         stopButton.addActionListener((_) -> {
             if (!boidsNumberInput.isEditable() && this.model.boidsHaveBeenSet()) {
@@ -118,8 +104,27 @@ public class BoidsView implements ChangeListener {
         inputPanel.add(boidsNumberInput);
         return inputPanel;
     }
-	
-	public void update(final int frameRate) {
+
+    private JButton getJButton(JTextField boidsNumberInput) {
+        var resumeButton = new JButton("START");
+        resumeButton.addActionListener((_) -> {
+            if (!boidsNumberInput.isEditable()) {
+                if (!this.model.boidsHaveBeenSet()) {
+					try { 
+                   		this.model.setBoids(Integer.parseInt(boidsNumberInput.getText()));
+						this.simulator.start();
+					} catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(frame, "Inserisci un numero valido.", "Errore", JOptionPane.ERROR_MESSAGE);
+                        boidsNumberInput.setEditable(true);
+						return;
+                    };
+                }
+            }
+        });
+        return resumeButton;
+    }
+
+    public void update(final int frameRate) {
         boidsPanel.setFrameRate(frameRate);
 		boidsPanel.repaint();
 	}

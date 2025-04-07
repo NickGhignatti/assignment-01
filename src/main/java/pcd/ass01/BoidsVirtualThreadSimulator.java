@@ -3,8 +3,6 @@ package pcd.ass01;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 
 public class BoidsVirtualThreadSimulator implements BoidsSimulator {
     private static final int FRAMERATE = 25;
@@ -73,7 +71,6 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
         this.isRunning = false;
 
         this.updateBarrier.breakBarrier();
-        this.barrier.breakBarrier();
 
         this.resetThread = true;
         this.model.clearBoids();
@@ -90,7 +87,7 @@ public class BoidsVirtualThreadSimulator implements BoidsSimulator {
             Thread.startVirtualThread(() -> {
                 while (!this.resetThread) {
                     try {
-                        this.updateBarrier.await();
+                        if (this.view.isPresent()) this.updateBarrier.await();
                         b.updateVelocity(this.model);
                         this.barrier.await();
                         b.updatePos(this.model);

@@ -24,7 +24,7 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
         this.view = Optional.empty();
         this.boids = new ArrayList<>();
         this.threadPool = new ArrayList<>();
-        this.numberOfProcessors = Runtime.getRuntime().availableProcessors() + 1;
+        this.numberOfProcessors = 12;
         this.resetThread = false;
         this.boidsBarrier = new BoidsBarrier(this.numberOfProcessors);
         this.boidsUpdateBarrier = new BoidsBarrier(this.numberOfProcessors + 1);
@@ -39,7 +39,17 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
     public void runSimulation() {
         while (true) {
             var t0 = System.currentTimeMillis();
-            this.view.ifPresent(boidsView -> {
+//            this.view.ifPresent(boidsView -> {
+//                if (this.isRunning) {
+//                    try {
+//                        this.boidsUpdateBarrier.await();
+//                    } catch (InterruptedException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
+//                boidsView.update(framerate);
+//            });
+            if (this.view.isPresent()) {
                 if (this.isRunning) {
                     try {
                         this.boidsUpdateBarrier.await();
@@ -47,8 +57,8 @@ public class BoidsPlatformThreadSimulator implements BoidsSimulator {
                         throw new RuntimeException(e);
                     }
                 }
-                boidsView.update(framerate);
-            });
+                this.view.get().update(framerate);
+            }
             var dtElapsed = System.currentTimeMillis() - t0;
             var frameratePeriod = 1000 / FRAMERATE;
 

@@ -30,7 +30,7 @@ public class BoidsTaskExecutorSimulator implements BoidsSimulator {
 
     @Override
     public void runSimulation() {
-        var executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+        var executor = Executors.newFixedThreadPool(12);
         while (true) {
             var t0 = System.currentTimeMillis();
 
